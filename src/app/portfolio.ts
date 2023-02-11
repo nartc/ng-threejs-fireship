@@ -109,7 +109,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
             h2,
             h3,
             blockquote {
-                font-family: elevon, sans-serif;
+                font-family: cubano, broadsheet, elevon, sans-serif;
                 font-weight: 700;
                 font-style: normal;
             }

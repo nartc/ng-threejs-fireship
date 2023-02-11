@@ -21,31 +21,29 @@ extend(THREE);
         <ng-container *ngIf="textures$ | ngtPush as textures">
             <ngt-value [rawValue]="textures.space" attach="background" />
 
-            <!--    torus-->
+            <!--torus-->
             <ngt-mesh #torus>
                 <ngt-torus-geometry *args="[10, 3, 16, 100]" />
                 <ngt-mesh-standard-material color="#ff6347" />
             </ngt-mesh>
 
-            <!--    lights-->
+            <!--lights-->
             <ngt-point-light color="#ffffff" [position]="[5, 5, 5]" />
             <ngt-ambient-light color="#ffffff" />
 
-            <!--    stars-->
+            <!--stars-->
             <ngt-sphere-geometry *args="[0.25, 24, 24]" [ref]="star" />
-            <ngt-mesh-standard-material #starMaterial />
-            <ng-container *ngFor="let position of starPositions">
-                <ngt-mesh [position]="position" [geometry]="star.nativeElement" [material]="starMaterial" />
-            </ng-container>
+            <ngt-mesh-standard-material #mat />
+            <ngt-mesh *ngFor="let p of positions" [position]="p" [geometry]="star.nativeElement" [material]="mat" />
 
-            <!-- avatar -->
-            <ngt-mesh #chau [position]="[2, 0, -5]">
+            <!--avatar -->
+            <ngt-mesh #avatar [position]="[2, 0, -5]">
                 <ngt-box-geometry *args="[3, 3, 3]"></ngt-box-geometry>
                 <ngt-mesh-basic-material [map]="textures.avatar" />
             </ngt-mesh>
 
-            <!--    moon-->
-            <ngt-mesh #moon [position]="[-10, 0, 30]">
+            <!--moon-->
+            <ngt-mesh #moon [position]="[-10, 0, 23]">
                 <ngt-sphere-geometry *args="[3, 32, 32]"></ngt-sphere-geometry>
                 <ngt-mesh-standard-material [map]="textures.moon" [normalMap]="textures.normal" />
             </ngt-mesh>
@@ -55,18 +53,18 @@ extend(THREE);
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class Scene implements OnInit {
-    readonly starPositions: [number, number, number][] = Array.from({ length: 200 }, () => [
+    readonly positions: [number, number, number][] = Array.from({ length: 200 }, () => [
         THREE.MathUtils.randFloatSpread(100),
         THREE.MathUtils.randFloatSpread(100),
         THREE.MathUtils.randFloatSpread(100),
     ]);
 
-    private readonly store = inject(NgtStore);
+    private readonly camera = inject(NgtStore).get('camera');
     private readonly document = inject(DOCUMENT);
     private readonly ngtDestroy = injectNgtDestroy();
 
     readonly textures$ = injectNgtLoader(() => THREE.TextureLoader, {
-        avatar: 'assets/chau.jpeg',
+        avatar: 'assets/chau.png',
         moon: 'assets/moon.jpeg',
         normal: 'assets/normal.jpeg',
         space: 'assets/space.jpeg',
@@ -75,7 +73,7 @@ export class Scene implements OnInit {
     readonly star = injectNgtRef<THREE.SphereGeometry>();
 
     @ViewChild('torus') torus?: ElementRef<THREE.Mesh>;
-    @ViewChild('chau') chau?: ElementRef<THREE.Mesh>;
+    @ViewChild('avatar') avatar?: ElementRef<THREE.Mesh>;
     @ViewChild('moon') moon?: ElementRef<THREE.Mesh>;
 
     constructor() {
@@ -106,15 +104,14 @@ export class Scene implements OnInit {
                     this.moon.nativeElement.rotation.z += 0.05;
                 }
 
-                if (this.chau) {
-                    this.chau.nativeElement.rotation.y += 0.01;
-                    this.chau.nativeElement.rotation.z += 0.01;
+                if (this.avatar) {
+                    this.avatar.nativeElement.rotation.y += 0.01;
+                    this.avatar.nativeElement.rotation.z += 0.01;
                 }
 
-                const camera = this.store.get('camera');
-                camera.position.z = top * -0.01;
-                camera.position.x = top * -0.0002;
-                camera.rotation.y = top * -0.0002;
+                this.camera.position.z = top * -0.01;
+                this.camera.position.x = top * -0.0002;
+                this.camera.rotation.y = top * -0.0002;
             });
     }
 }
